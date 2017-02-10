@@ -1,0 +1,45 @@
+import {EventEmitter} from 'events';
+import {browserHistory} from 'react-router';
+import {Auth} from './Auth';
+
+export default class AuthService extends EventEmitter {
+    auth:Auth;
+    constructor(clientId, domain) {
+        super();
+        this.auth = new Auth();
+        this.login = this.login.bind(this);
+    }
+
+    login(username:string, password:string) {
+        this.auth.login(username, password)
+            .then(function(data){
+                console.log('logged in');
+                console.log(data);
+                this.setToken("123456");
+                browserHistory.replace('/home');
+            });
+    }
+
+  loggedIn() {
+    // Checks if there is a saved token and it's still valid
+    return !!this.getToken();
+  }
+  setToken(idToken) {
+    // Saves user token to local storage
+    localStorage.setItem('id_token', idToken);
+  }
+
+  getToken() {
+    // Retrieves the user token from local storage
+    return localStorage.getItem('id_token');
+  }
+
+  isTokenExpired() {
+      return false;
+  }
+
+  logout() {
+    // Clear user token and profile data from local storage
+    localStorage.removeItem('id_token');
+  }
+}
